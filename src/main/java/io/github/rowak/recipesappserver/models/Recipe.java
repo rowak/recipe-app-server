@@ -117,6 +117,54 @@ public class Recipe {
 		this.header = header;
 	}
 	
+	public String getName() {
+		return header.getName();
+	}
+	
+	public void setName(String name) {
+		header.setName(name);
+	}
+	
+	public String getCreator() {
+		return header.getCreator();
+	}
+	
+	public void setCreator(String creator) {
+		header.setCreator(creator);
+	}
+	
+	public String getCategory() {
+		return header.getCategory();
+	}
+	
+	public void setCategory(String category) {
+		header.setCategory(category);
+	}
+	
+	public int getPrepTime() {
+		return header.getPrepTime();
+	}
+	
+	public void setPrepTime(int prepTime) {
+		header.setPrepTime(prepTime);
+	}
+	
+	public int getCookTime() {
+		return header.getCookTime();
+	}
+	
+	public void setCookTime(int cookTime) {
+		header.setCookTime(cookTime);
+	}
+	
+	public int getServings() {
+		return header.getServings();
+	}
+	
+	public void setServings(int servings) {
+		header.setServings(servings);
+	}
+	
 	public Ingredient[] getIngredients() {
 		return ingredients;
 	}

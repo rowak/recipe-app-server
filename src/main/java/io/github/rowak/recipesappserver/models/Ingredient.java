@@ -2,6 +2,8 @@ package io.github.rowak.recipesappserver.models;
 
 import org.json.JSONObject;
 
+import io.github.rowak.recipesappserver.tools.Fraction;
+
 public class Ingredient {
 	private String measurementQty;
 	private String measurementUnit;
@@ -122,15 +124,12 @@ public class Ingredient {
 		return obj;
 	}
 	
-	public toReadableString(int servings) {
-		
-	}
-	
-	@Override
-	public String toString() {
+	public String toString(int servings, int recipeServings) {
 		StringBuilder sb = new StringBuilder();
 		if (measurementQty != null) {
-			sb.append(measurementQty + " ");
+			Fraction frac = Fraction.fromString(measurementQty);
+			frac.multiply(new Fraction(servings, recipeServings));
+			sb.append(frac.toMixedStr() + " ");
 		}
 		if (measurementUnit != null) {
 			sb.append(measurementUnit + " ");
@@ -142,6 +141,11 @@ public class Ingredient {
 			sb.append(", " + state);
 		}
 		return capitalizeFirstChar(sb.toString());
+	}
+	
+	@Override
+	public String toString() {
+		return toString(1, 1);
 	}
 	
 	private String capitalizeFirstChar(String str) {

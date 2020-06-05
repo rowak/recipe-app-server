@@ -102,7 +102,7 @@ public class RecipesDB {
 				"WHERE recipe_id = " + recipeId + ";");
 	}
 	
-	protected static Connection getConnection() throws SQLException {
+	private static Connection getConnection() throws SQLException {
 		String dbUrl = System.getenv("JDBC_DATABASE_URL");
 	    return DriverManager.getConnection(dbUrl);
 	}
