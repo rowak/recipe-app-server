@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import io.github.rowak.recipesappserver.models.Category;
 import io.github.rowak.recipesappserver.models.Recipe;
 import io.github.rowak.recipesappserver.sql.RecipesDB;
 
@@ -34,7 +35,23 @@ public class RequestHandler {
 	}
 	
 	private Response getCategoriesResponse(Request request) {
-		throw new UnsupportedOperationException("Not yet implemented");
+		try {
+			db.connect();
+			Category[] categories = db.getCategories();
+			db.disconnect();
+			if (categories != null) {
+				JSONArray categoriesJson = new JSONArray();
+				for (Category category : categories) {
+					categoriesJson.put(category.toJSON());
+				}
+				return new Response(ResponseType.CATEGORIES,
+						getDataObject(categoriesJson));
+			}
+			return Response.RESOURCE_NOT_FOUND;
+		} catch (SQLException | IOException e) {
+			e.printStackTrace();
+			return Response.DATABASE_ERROR;
+		}
 	}
 	
 	private Response getRecipeHeadersResponse(Request request) {
@@ -52,9 +69,6 @@ public class RequestHandler {
 		try {
 			db.connect();
 			Recipe recipe = db.getRecipe(recipeName);
-			for (io.github.rowak.recipesappserver.models.Ingredient ingredient : recipe.getIngredients()) {
-				System.out.println(ingredient.toString());
-			}
 			db.disconnect();
 			if (recipe != null) {
 				return new Response(ResponseType.RECIPE,

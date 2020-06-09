@@ -23,6 +23,11 @@ public class Recipe {
 			ingredients = new ArrayList<Ingredient>();
 		}
 		
+		public Builder setId(int id) {
+			headerBuilder.setId(id);
+			return this;
+		}
+		
 		public Builder setName(String name) {
 			headerBuilder.setName(name);
 			return this;
@@ -35,6 +40,11 @@ public class Recipe {
 		
 		public Builder setCategory(String category) {
 			headerBuilder.setCategory(category);
+			return this;
+		}
+		
+		public Builder setImageUrl(String imageUrl) {
+			headerBuilder.setImageUrl(imageUrl);
 			return this;
 		}
 		
@@ -87,9 +97,11 @@ public class Recipe {
 		Recipe.Builder recipeBuilder = new Recipe.Builder();
 		if (json.has("header")) {
 			RecipeHeader header = RecipeHeader.fromJSON(json.getJSONObject("header"));
+			recipeBuilder.setId(header.getId());
 			recipeBuilder.setName(header.getName());
 			recipeBuilder.setCreator(header.getCreator());
 			recipeBuilder.setCategory(header.getCategory());
+			recipeBuilder.setImageUrl(header.getImageUrl());
 			recipeBuilder.setPrepTime(header.getPrepTime());
 			recipeBuilder.setCookTime(header.getCookTime());
 			recipeBuilder.setServings(header.getServings());
@@ -117,6 +129,14 @@ public class Recipe {
 		this.header = header;
 	}
 	
+	public int getId() {
+		return header.getId();
+	}
+	
+	public void setId(int id) {
+		header.setId(id);
+	}
+	
 	public String getName() {
 		return header.getName();
 	}
@@ -139,6 +159,14 @@ public class Recipe {
 	
 	public void setCategory(String category) {
 		header.setCategory(category);
+	}
+	
+	public String getImageUrl() {
+		return header.getImageUrl();
+	}
+	
+	public void setImageUrl(String imageUrl) {
+		header.setImageUrl(imageUrl);
 	}
 	
 	public int getPrepTime() {

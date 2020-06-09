@@ -5,6 +5,14 @@ import org.json.JSONObject;
 import io.github.rowak.recipesappserver.tools.Fraction;
 
 public class Ingredient {
+	private static final String[] NON_PLURAL_UNITS = {
+			"oz", "dr", "gt", "gtt", "smdg", "smi",
+			"pn", "ds", "ssp", "csp", "fl.dr", "tsp",
+			"dsp", "dssp", "dstspn", "tbsp", "Tbsp",
+			"oz", "fl.oz", "wgf", "tcf", "pt", "qt",
+			"pot", "gal"
+	};
+	
 	private String measurementQty;
 	private String measurementUnit;
 	private String name;
@@ -132,10 +140,23 @@ public class Ingredient {
 			sb.append(frac.toMixedStr() + " ");
 		}
 		if (measurementUnit != null) {
-			sb.append(measurementUnit + " ");
+			String qty = measurementQty == null ?
+					capitalizeFirstChar(measurementUnit) :
+						measurementUnit;
+			sb.append(qty);
+			if (unitIsPlural()) {
+				sb.append("s");
+			}
+			sb.append(" ");
 		}
 		if (name != null) {
-			sb.append(name);
+			String ingredientName = measurementQty == null &&
+					measurementUnit == null ?
+					capitalizeFirstChar(name) : name;
+			sb.append(ingredientName);
+			if (ingredientNameIsPlural()) {
+				sb.append("s");
+			}
 		}
 		if (state != null) {
 			sb.append(", " + state);
@@ -149,6 +170,27 @@ public class Ingredient {
 	}
 	
 	private String capitalizeFirstChar(String str) {
-		return str.substring(0, 1) + str.substring(1);
+		return str.substring(0, 1).toUpperCase() + str.substring(1);
+	}
+	
+	private boolean unitIsPlural() {
+		if (measurementQty != null) {
+			for (String unit : NON_PLURAL_UNITS) {
+				if (unit.equals(measurementUnit)) {
+					return false;
+				}
+			}
+			Fraction frac = Fraction.fromString(measurementQty);
+			return frac.toDecimal() > 1;
+		}
+		return false;
+	}
+	
+	private boolean ingredientNameIsPlural() {
+		if (measurementQty != null && measurementUnit == null) {
+			Fraction frac = Fraction.fromString(measurementQty);
+			return frac.toDecimal() > 1 && name.charAt(name.length()-1) != 's';
+		}
+		return false;
 	}
 }

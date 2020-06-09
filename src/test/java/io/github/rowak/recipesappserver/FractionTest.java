@@ -1,13 +1,11 @@
 package io.github.rowak.recipesappserver;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
 
+import io.github.rowak.recipesappserver.models.Category;
 import io.github.rowak.recipesappserver.models.Ingredient;
 import io.github.rowak.recipesappserver.models.Recipe;
 import io.github.rowak.recipesappserver.sql.RecipesDB;
@@ -29,14 +27,41 @@ public class FractionTest {
 //		}
 	}
 	
+//	@Test
+//	public void listRecipeIngredients() throws SQLException, IOException {
+//		RecipesDB db = new RecipesDB();
+//		db.connect();
+//		Recipe recipe = db.getRecipe("");
+//		db.disconnect();
+//		for (Ingredient ingredient : recipe.getIngredients()) {
+//			System.out.println(ingredient.toString(8, recipe.getServings()));
+//		}
+//	}
+	
 	@Test
-	public void listRecipeIngredients() throws SQLException, IOException {
+	public void recipesShouldBeListedAsJson() throws SQLException, IOException {
 		RecipesDB db = new RecipesDB();
 		db.connect();
-		Recipe recipe = db.getRecipe("");
+		Recipe[] recipes = db.getRecipes();
 		db.disconnect();
-		for (Ingredient ingredient : recipe.getIngredients()) {
-			System.out.println(ingredient.toString(4, recipe.getServings()));
+		System.out.println("RECIPES:");
+		for (Recipe recipe : recipes) {
+			System.out.println(recipe);
+			for (Ingredient ingredient : recipe.getIngredients()) {
+				System.out.println("  " + ingredient.toString() + "     : " + ingredient.getCategory());
+			}
+		}
+	}
+	
+	@Test
+	public void categoriesShouldBeListedAsString() throws SQLException, IOException {
+		RecipesDB db = new RecipesDB();
+		db.connect();
+		Category[] categories = db.getCategories();
+		db.disconnect();
+		System.out.println("CATEGORIES:");
+		for (Category category : categories) {
+			System.out.println(category.getName() + "     : " + category.getParent());
 		}
 	}
 }

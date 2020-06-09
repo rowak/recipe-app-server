@@ -22,7 +22,7 @@ public class Fraction {
 			return null;
 		}
 		try {
-			int denom = data.length > 1 ? Integer.parseInt(data[1]) : 0;
+			int denom = data.length > 1 ? Integer.parseInt(data[1]) : 1;
 			return new Fraction(Integer.parseInt(data[0]), denom);
 		} catch (NumberFormatException e) {
 			return null;
@@ -49,6 +49,10 @@ public class Fraction {
 	public void divide(Fraction frac) {
 		num *= frac.denom;
 		denom *= frac.num;
+	}
+	
+	public double toDecimal() {
+		return num / (double)denom;
 	}
 	
 	public String toMixedStr() {

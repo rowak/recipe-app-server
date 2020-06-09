@@ -2,13 +2,11 @@ package io.github.rowak.recipesappserver.net;
 
 import org.json.JSONObject;
 
-public class Response
-{
+public class Response {
 	private ResponseType respType;
 	private JSONObject data;
 	
-	public Response(ResponseType respType, JSONObject data)
-	{
+	public Response(ResponseType respType, JSONObject data) {
 		this.respType = respType;
 		this.data = data;
 		this.data.put("type", respType);
@@ -22,58 +20,47 @@ public class Response
 			new Response(ResponseType.RESOURCE_NOT_FOUND, new JSONObject());
 	public static Response VERSION = getVersionResponse();
 	
-	public static Response fromJSON(String json)
-	{
+	public static Response fromJSON(String json) {
 		Response resp = new Response(null, null);
 		JSONObject obj = new JSONObject(json);
-		if (obj.has("type"))
-		{
+		if (obj.has("type")) {
 			resp.respType = formatResponseType(obj.getString("type"));
 		}
-		if (obj.has("data"))
-		{
+		if (obj.has("data")) {
 			resp.data = obj.getJSONObject("data");
 		}
 		return resp;
 	}
 	
-	public JSONObject toJSON()
-	{
+	public JSONObject toJSON() {
 		return data;
 	}
 	
-	public ResponseType getType()
-	{
+	public ResponseType getType() {
 		return respType;
 	}
 	
-	public JSONObject getData()
-	{
+	public JSONObject getData() {
 		return data;
 	}
 	
-	private static ResponseType formatResponseType(String responseStr)
-	{
-		for (ResponseType type : ResponseType.values())
-		{
-			if (type.toString().equals(responseStr))
-			{
+	private static ResponseType formatResponseType(String responseStr) {
+		for (ResponseType type : ResponseType.values()) {
+			if (type.toString().equals(responseStr)) {
 				return type;
 			}
 		}
 		return null;
 	}
 	
-	private static Response getVersionResponse()
-	{
+	private static Response getVersionResponse() {
 		JSONObject obj = new JSONObject();
 		obj.put("data", Server.VERSION);
 		return new Response(ResponseType.VERSION, obj);
 	}
 	
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return toJSON().toString();
 	}
 }
