@@ -7,7 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class ImgurImage {
-	private static final String BASE_URL = "https://api.imgur.com/3/image/";
+	private static final String BASE_URL = "https://i.imgur.com/";
 	private static final String FILE_TYPE = "jpg";
 	
 	public byte[] getImageData(String imageHash) throws IOException {
@@ -28,7 +28,7 @@ public class ImgurImage {
 		return out.toByteArray();
 	}
 	
-	private URL getUrl(String imageHash) throws MalformedURLException {
+	public static URL getUrl(String imageHash) throws MalformedURLException {
 		return new URL(BASE_URL + imageHash + "." + FILE_TYPE);
 	}
 }

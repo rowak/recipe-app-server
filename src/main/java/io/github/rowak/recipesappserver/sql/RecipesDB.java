@@ -12,6 +12,7 @@ import java.util.List;
 import io.github.rowak.recipesappserver.models.Category;
 import io.github.rowak.recipesappserver.models.Ingredient;
 import io.github.rowak.recipesappserver.models.Recipe;
+import io.github.rowak.recipesappserver.net.ImgurImage;
 
 public class RecipesDB {
 	private Connection conn;
@@ -56,7 +57,7 @@ public class RecipesDB {
 						.setDescription(recipeTable.getString("recipe_description"))
 						.setDirections(recipeTable.getString("recipe_directions"))
 						.setCategory(recipeTable.getString("category_name"))
-						.setImageUrl(recipeTable.getString("image_url"))
+						.setImageUrl(ImgurImage.getUrl(recipeTable.getString("image_url")).toString())
 						.setPrepTime(recipeTable.getInt("prep_time"))
 						.setCookTime(recipeTable.getInt("cook_time"))
 						.setServings(recipeTable.getInt("servings"))
@@ -93,11 +94,13 @@ public class RecipesDB {
 				}
 				ingredientsTable.getStatement().close();
 				recipes.add(new Recipe.Builder()
+						.setId(recipesTable.getInt("recipe_id"))
 						.setName(recipesTable.getString("recipe_name"))
 						.setCreator(recipesTable.getString("creator_name"))
 						.setDescription(recipesTable.getString("recipe_description"))
 						.setDirections(recipesTable.getString("recipe_directions"))
 						.setCategory(recipesTable.getString("category_name"))
+						.setImageUrl(ImgurImage.getUrl(recipesTable.getString("image_hash")).toString())
 						.setPrepTime(recipesTable.getInt("prep_time"))
 						.setCookTime(recipesTable.getInt("cook_time"))
 						.setServings(recipesTable.getInt("servings"))
@@ -135,11 +138,10 @@ public class RecipesDB {
 	
 	private ResultSet getRecipesTable() throws SQLException {
 		Statement stmt = conn.createStatement();
-		return stmt.executeQuery("SELECT * FROM ((recipes " + 
-				 "JOIN creators " +
-				 "ON recipes.creator_id = creators.creator_id) " +
-				 "JOIN recipe_categories " +
-				 "ON recipes.category_id = recipe_categories.category_id);");
+		return stmt.executeQuery("SELECT * FROM (((recipes " + 
+				 "JOIN creators ON recipes.creator_id = creators.creator_id) " +
+				 "JOIN recipe_categories ON recipes.category_id = recipe_categories.category_id) " +
+				 "LEFT OUTER JOIN recipe_images ON recipes.recipe_id = recipe_images.recipe_id);");
 	}
 	
 	private ResultSet getIngredientsTable() throws SQLException {
@@ -160,7 +162,7 @@ public class RecipesDB {
 		return stmt.executeQuery("SELECT * FROM (((recipes " + 
 				 "JOIN creators ON recipes.creator_id = creators.creator_id) " +
 				 "JOIN recipe_categories ON recipes.category_id = recipe_categories.category_id) " +
-				 "JOIN recipe_images ON recipes.recipe_id = recipe_images.recipe_id) " +
+				 "LEFT OUTER JOIN recipe_images ON recipes.recipe_id = recipe_images.recipe_id) " +
 				 "WHERE recipes.recipe_name = '" + recipeName + "';");
 	}
 	

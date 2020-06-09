@@ -44,6 +44,18 @@ public class FractionTest {
 		db.connect();
 		Recipe[] recipes = db.getRecipes();
 		db.disconnect();
+		System.out.println("RECIPES_JSON:");
+		for (Recipe recipe : recipes) {
+			System.out.println(recipe.toJSON());
+		}
+	}
+	
+	@Test
+	public void recipesIngredientsShouldBeListed() throws SQLException, IOException {
+		RecipesDB db = new RecipesDB();
+		db.connect();
+		Recipe[] recipes = db.getRecipes();
+		db.disconnect();
 		System.out.println("RECIPES:");
 		for (Recipe recipe : recipes) {
 			System.out.println(recipe);
