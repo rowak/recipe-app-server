@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import io.github.rowak.recipesappserver.models.Category;
 import io.github.rowak.recipesappserver.models.Recipe;
+import io.github.rowak.recipesappserver.models.RecipeHeader;
 import io.github.rowak.recipesappserver.sql.RecipesDB;
 
 public class RequestHandler {
@@ -55,7 +56,31 @@ public class RequestHandler {
 	}
 	
 	private Response getRecipeHeadersResponse(Request request) {
-		throw new UnsupportedOperationException("Not yet implemented");
+		JSONObject data = request.getData();
+		String categoryName = data.has("categoryName") ?
+				data.getString("categoryName") : null;
+		if (categoryName == null) {
+			return Response.INVALID_REQUEST;
+		}
+		
+		try {
+			db.connect();
+			RecipeHeader[] recipeHeaders =
+					db.getRecipeHeadersFromCategory(categoryName);
+			db.disconnect();
+			if (recipeHeaders != null) {
+				JSONArray recipeHeadersJson = new JSONArray();
+				for (RecipeHeader header : recipeHeaders) {
+					recipeHeadersJson.put(header.toJSON());
+				}
+				return new Response(ResponseType.RECIPE_HEADERS,
+						getDataObject(recipeHeadersJson));
+			}
+			return Response.RESOURCE_NOT_FOUND;
+		} catch (SQLException | IOException e) {
+			e.printStackTrace();
+			return Response.DATABASE_ERROR;
+		}
 	}
 	
 	private Response getRecipeResponse(Request request) {

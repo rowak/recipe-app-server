@@ -9,13 +9,11 @@ import org.json.JSONObject;
 public class Recipe {
 	private RecipeHeader header;
 	private Ingredient[] ingredients;
-	private String description;
 	private String directions;  // HTML encoded
 	
 	public static class Builder {
 		private RecipeHeader.Builder headerBuilder;
 		private List<Ingredient> ingredients;
-		private String description;
 		private String directions;
 		
 		public Builder() {
@@ -74,7 +72,7 @@ public class Recipe {
 		}
 		
 		public Builder setDescription(String description) {
-			this.description = description;
+			headerBuilder.setDescription(description);
 			return this;
 		}
 		
@@ -87,7 +85,6 @@ public class Recipe {
 			Recipe recipe = new Recipe();
 			recipe.header = headerBuilder.build();
 			recipe.ingredients = ingredients.toArray(new Ingredient[0]);
-			recipe.description = description;
 			recipe.directions = directions;
 			return recipe;
 		}
@@ -100,6 +97,7 @@ public class Recipe {
 			recipeBuilder.setId(header.getId());
 			recipeBuilder.setName(header.getName());
 			recipeBuilder.setCreator(header.getCreator());
+			recipeBuilder.setDescription(header.getDescription());
 			recipeBuilder.setCategory(header.getCategory());
 			recipeBuilder.setImageUrl(header.getImageUrl());
 			recipeBuilder.setPrepTime(header.getPrepTime());
@@ -153,6 +151,14 @@ public class Recipe {
 		header.setCreator(creator);
 	}
 	
+	public String getDescription() {
+		return header.getDescription();
+	}
+	
+	public void setDescription(String description) {
+		header.setDescription(description);
+	}
+	
 	public String getCategory() {
 		return header.getCategory();
 	}
@@ -201,12 +207,12 @@ public class Recipe {
 		this.ingredients = ingredients;
 	}
 	
-	public String getDescription() {
-		return description;
-	}
-	
 	public String getDirections() {
 		return directions;
+	}
+	
+	public void setDirections(String directions) {
+		this.directions = directions;
 	}
 	
 	public JSONObject toJSON() {
@@ -217,7 +223,6 @@ public class Recipe {
 			arr.put(ingredient.toJSON());
 		}
 		obj.put("ingredients", arr);
-		obj.put("description", description);
 		obj.put("directions", directions);
 		return obj;
 	}

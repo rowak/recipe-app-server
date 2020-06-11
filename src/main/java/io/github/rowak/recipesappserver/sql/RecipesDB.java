@@ -1,6 +1,7 @@
 package io.github.rowak.recipesappserver.sql;
 
 import java.io.IOException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -12,6 +13,7 @@ import java.util.List;
 import io.github.rowak.recipesappserver.models.Category;
 import io.github.rowak.recipesappserver.models.Ingredient;
 import io.github.rowak.recipesappserver.models.Recipe;
+import io.github.rowak.recipesappserver.models.RecipeHeader;
 import io.github.rowak.recipesappserver.net.ImgurImage;
 
 public class RecipesDB {
@@ -50,6 +52,7 @@ public class RecipesDB {
 							.setCategory(ingredientsTable.getString("category_name"))
 							.build());
 				}
+				URL url = ImgurImage.getUrl(recipeTable.getString("image_hash"));
 				Recipe recipe = new Recipe.Builder()
 						.setId(recipeTable.getInt("recipe_id"))
 						.setName(recipeTable.getString("recipe_name"))
@@ -57,7 +60,7 @@ public class RecipesDB {
 						.setDescription(recipeTable.getString("recipe_description"))
 						.setDirections(recipeTable.getString("recipe_directions"))
 						.setCategory(recipeTable.getString("category_name"))
-						.setImageUrl(ImgurImage.getUrl(recipeTable.getString("image_url")).toString())
+						.setImageUrl(url != null ? url.toString() : null)
 						.setPrepTime(recipeTable.getInt("prep_time"))
 						.setCookTime(recipeTable.getInt("cook_time"))
 						.setServings(recipeTable.getInt("servings"))
@@ -70,9 +73,52 @@ public class RecipesDB {
 		throw new IOException("Not connected");
 	}
 	
-//	public RecipeHeader[] getRecipeHeaders() {
-//		
+//	public RecipeHeader[] getRecipeHeaders() throws SQLException, IOException {
+//		if (conn != null) {
+//			ResultSet recipesTable = getRecipeHeadersTable();
+//			List<RecipeHeader> recipeHeaders = new ArrayList<RecipeHeader>();
+//			while (recipesTable.next()) {
+//				URL url = ImgurImage.getUrl(recipesTable.getString("image_hash"));
+//				recipeHeaders.add(new RecipeHeader.Builder()
+//						.setId(recipesTable.getInt("recipe_id"))
+//						.setName(recipesTable.getString("recipe_name"))
+//						.setCreator(recipesTable.getString("creator_name"))
+//						.setDescription(recipesTable.getString("recipe_description"))
+//						.setCategory(recipesTable.getString("category_name"))
+//						.setImageUrl(url != null ? url.toString() : null)
+//						.setPrepTime(recipesTable.getInt("prep_time"))
+//						.setCookTime(recipesTable.getInt("cook_time"))
+//						.setServings(recipesTable.getInt("servings"))
+//						.build());
+//			}
+//			return recipeHeaders.toArray(new RecipeHeader[0]);
+//		}
+//		throw new IOException("Not connected");
 //	}
+	
+	public RecipeHeader[] getRecipeHeadersFromCategory(String category)
+			throws SQLException, IOException {
+		if (conn != null) {
+			ResultSet recipesTable = getRecipeHeadersTable(category);
+			List<RecipeHeader> recipeHeaders = new ArrayList<RecipeHeader>();
+			while (recipesTable.next()) {
+				URL url = ImgurImage.getUrl(recipesTable.getString("image_hash"));
+				recipeHeaders.add(new RecipeHeader.Builder()
+						.setId(recipesTable.getInt("recipe_id"))
+						.setName(recipesTable.getString("recipe_name"))
+						.setCreator(recipesTable.getString("creator_name"))
+						.setDescription(recipesTable.getString("recipe_description"))
+						.setCategory(recipesTable.getString("category_name"))
+						.setImageUrl(url != null ? url.toString() : null)
+						.setPrepTime(recipesTable.getInt("prep_time"))
+						.setCookTime(recipesTable.getInt("cook_time"))
+						.setServings(recipesTable.getInt("servings"))
+						.build());
+			}
+			return recipeHeaders.toArray(new RecipeHeader[0]);
+		}
+		throw new IOException("Not connected");
+	}
 	
 	public Recipe[] getRecipes() throws SQLException, IOException {
 		if (conn != null) {
@@ -93,6 +139,7 @@ public class RecipesDB {
 							.build());
 				}
 				ingredientsTable.getStatement().close();
+				URL url = ImgurImage.getUrl(recipesTable.getString("image_hash"));
 				recipes.add(new Recipe.Builder()
 						.setId(recipesTable.getInt("recipe_id"))
 						.setName(recipesTable.getString("recipe_name"))
@@ -100,7 +147,7 @@ public class RecipesDB {
 						.setDescription(recipesTable.getString("recipe_description"))
 						.setDirections(recipesTable.getString("recipe_directions"))
 						.setCategory(recipesTable.getString("category_name"))
-						.setImageUrl(ImgurImage.getUrl(recipesTable.getString("image_hash")).toString())
+						.setImageUrl(url != null ? url.toString() : null)
 						.setPrepTime(recipesTable.getInt("prep_time"))
 						.setCookTime(recipesTable.getInt("cook_time"))
 						.setServings(recipesTable.getInt("servings"))
@@ -119,7 +166,8 @@ public class RecipesDB {
 			ResultSet categoriesTable = getCategoriesTable();
 			while (categoriesTable.next()) {
 				categories.add(new Category(categoriesTable.getString("category_name"),
-											categoriesTable.getString("category_parent")));
+											categoriesTable.getString("category_parent"),
+											categoriesTable.getInt("recipe_count")));
 			}
 			categoriesTable.getStatement().close();
 			return categories.toArray(new Category[0]);
@@ -130,10 +178,16 @@ public class RecipesDB {
 	private ResultSet getCategoriesTable() throws SQLException {
 		Statement stmt = conn.createStatement();
 		return stmt.executeQuery("SELECT recipe_categories.category_name, " +
-				"parent_categories.category_name AS category_parent " + 
-				"FROM recipe_categories " + 
-				"LEFT OUTER JOIN recipe_categories parent_categories " + 
-				"ON recipe_categories.category_parent_id = parent_categories.category_id;");
+				"parent_categories.category_name AS category_parent, COUNT(*) AS recipe_count " + 
+				"FROM (recipes " + 
+				"RIGHT OUTER JOIN recipe_categories ON recipes.category_id = recipe_categories.category_id) " + 
+				"LEFT OUTER JOIN recipe_categories parent_categories ON recipe_categories.category_parent_id = parent_categories.category_id " + 
+				"GROUP BY recipe_categories.category_name, parent_categories.category_name;");
+//		return stmt.executeQuery("SELECT recipe_categories.category_name, " +
+//				"parent_categories.category_name AS category_parent " + 
+//				"FROM recipe_categories " + 
+//				"LEFT OUTER JOIN recipe_categories parent_categories " + 
+//				"ON recipe_categories.category_parent_id = parent_categories.category_id;");
 	}
 	
 	private ResultSet getRecipesTable() throws SQLException {
@@ -178,6 +232,27 @@ public class RecipesDB {
 				"JOIN ingredient_states ON recipe_ingredients.ingredient_state_id = ingredient_states.ingredient_state_id) " + 
 				"JOIN ingredient_categories ON recipe_ingredients.category_id = ingredient_categories.category_id) " +
 				"WHERE recipe_id = " + recipeId + ";");
+	}
+	
+//	private ResultSet getRecipeHeadersTable() throws SQLException {
+//		Statement stmt = conn.createStatement();
+//		return stmt.executeQuery("SELECT recipes.recipe_id, recipe_name, creator_name, " +
+//				 "recipe_description, category_name, image_hash, prep_time, cook_time, servings " +
+//				 "FROM (((recipes " + 
+//				 "JOIN creators ON recipes.creator_id = creators.creator_id) " +
+//				 "JOIN recipe_categories ON recipes.category_id = recipe_categories.category_id) " +
+//				 "LEFT OUTER JOIN recipe_images ON recipes.recipe_id = recipe_images.recipe_id);");
+//	}
+	
+	private ResultSet getRecipeHeadersTable(String categoryName) throws SQLException {
+		Statement stmt = conn.createStatement();
+		return stmt.executeQuery("SELECT recipes.recipe_id, recipe_name, creator_name, " +
+				 "recipe_description, category_name, image_hash, prep_time, cook_time, servings " +
+				 "FROM (((recipes " + 
+				 "JOIN creators ON recipes.creator_id = creators.creator_id) " +
+				 "JOIN recipe_categories ON recipes.category_id = recipe_categories.category_id) " +
+				 "LEFT OUTER JOIN recipe_images ON recipes.recipe_id = recipe_images.recipe_id) " +
+				 "WHERE category_name = '" + categoryName + "';");
 	}
 	
 	private static Connection getConnection() throws SQLException {

@@ -29,6 +29,6 @@ public class ImgurImage {
 	}
 	
 	public static URL getUrl(String imageHash) throws MalformedURLException {
-		return new URL(BASE_URL + imageHash + "." + FILE_TYPE);
+		return imageHash != null ? new URL(BASE_URL + imageHash + "." + FILE_TYPE) : null;
 	}
 }

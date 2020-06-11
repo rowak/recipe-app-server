@@ -6,6 +6,7 @@ public class RecipeHeader {
 	private int id;
 	private String name;
 	private String creator;
+	private String description;
 	private String category;
 	private String imageUrl;
 	private int prepTime;
@@ -16,6 +17,7 @@ public class RecipeHeader {
 		private int id;
 		private String name;
 		private String creator;
+		private String description;
 		private String category;
 		private String imageUrl;
 		private int prepTime;
@@ -34,6 +36,11 @@ public class RecipeHeader {
 		
 		public Builder setCreator(String creator) {
 			this.creator = creator;
+			return this;
+		}
+		
+		public Builder setDescription(String description) {
+			this.description = description;
 			return this;
 		}
 		
@@ -67,6 +74,7 @@ public class RecipeHeader {
 			header.id = id;
 			header.name = name;
 			header.creator = creator;
+			header.description = description;
 			header.category = category;
 			header.imageUrl = imageUrl;
 			header.prepTime = prepTime;
@@ -86,6 +94,9 @@ public class RecipeHeader {
 		}
 		if (json.has("creator")) {
 			headerBuilder.setCreator(json.getString("creator"));
+		}
+		if (json.has("description")) {
+			headerBuilder.setDescription(json.getString("description"));
 		}
 		if (json.has("category")) {
 			headerBuilder.setCategory(json.getString("category"));
@@ -127,6 +138,14 @@ public class RecipeHeader {
 	
 	public void setCreator(String creator) {
 		this.creator = creator;
+	}
+	
+	public String getDescription() {
+		return description;
+	}
+	
+	public void setDescription(String description) {
+		this.description = description;
 	}
 	
 	public String getCategory() {
@@ -178,6 +197,7 @@ public class RecipeHeader {
 		obj.put("id", id);
 		obj.put("name", name);
 		obj.put("creator", creator);
+		obj.put("description", description);
 		obj.put("category", category);
 		obj.put("imageUrl", imageUrl);
 		obj.put("prepTime", prepTime);
