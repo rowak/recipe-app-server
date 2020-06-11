@@ -170,9 +170,33 @@ public class RecipesDB {
 											categoriesTable.getInt("recipe_count")));
 			}
 			categoriesTable.getStatement().close();
-			return categories.toArray(new Category[0]);
+			Category[] categoryArr = categories.toArray(new Category[0]);
+			updateCategoryNumRecipes(categoryArr);
+			return categoryArr;
 		}
 		throw new IOException("Not connected");
+	}
+	
+	private void updateCategoryNumRecipes(Category[] categories) {
+		for (Category category : categories) {
+			Category child = category;
+			Category parent;
+			while ((parent = getCategoryByName(categories, child.getParent())) != null) {
+				parent.setNumRecipes(parent.getNumRecipes() + category.getNumRecipes());
+				child = parent;
+			}
+		}
+	}
+	
+	private Category getCategoryByName(Category[] categories, String name) {
+		if (name != null) {
+			for (Category category : categories) {
+				if (category.getName().equals(name)) {
+					return category;
+				}
+			}
+		}
+		return null;
 	}
 	
 	private ResultSet getCategoriesTable() throws SQLException {
