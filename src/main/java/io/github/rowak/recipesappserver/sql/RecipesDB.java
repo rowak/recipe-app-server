@@ -185,6 +185,9 @@ public class RecipesDB {
 				parent.setNumRecipes(parent.getNumRecipes() + category.getNumRecipes());
 				child = parent;
 			}
+			if (category.getParent() == null) {
+				category.setNumRecipes(category.getNumRecipes() - 1);
+			}
 		}
 	}
 	
