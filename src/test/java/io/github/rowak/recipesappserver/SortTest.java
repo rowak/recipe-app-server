@@ -1,8 +1,6 @@
 package io.github.rowak.recipesappserver;
 
-import org.junit.Test;
-
-import io.github.rowak.recipesappserver.models.Ingredient;
+import org.junit.jupiter.api.Test;
 
 public class SortTest {
 	@Test
