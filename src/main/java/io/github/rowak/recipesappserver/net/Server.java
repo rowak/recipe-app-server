@@ -123,6 +123,10 @@ public class Server extends NanoHTTPD {
 					String extensionLong = url.substring(url.length()-5);
 					String extension = extensionLong.split("\\.")[1];
 					String mimeType = "text/" + extension;
+					if (mimeType.equals("js"))
+					{
+						mimeType = "javascript";
+					}
 					return newFixedLengthResponse(NanoHTTPD.Response.Status.OK,
 							mimeType, readFileToString(file));
 				}
