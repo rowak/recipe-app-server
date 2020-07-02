@@ -4,5 +4,6 @@ public enum RequestType {
 	VERSION,			// required: *none*
 	CATEGORIES,			// required: *none*
 	RECIPE_HEADERS,		// required: categoryName
-	RECIPE				// required: recipeName
+	RECIPE,				// required: recipeName
+	FILE				// required: fileName
 }

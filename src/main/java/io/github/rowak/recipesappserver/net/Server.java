@@ -1,6 +1,7 @@
 package io.github.rowak.recipesappserver.net;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
@@ -44,8 +45,13 @@ public class Server extends NanoHTTPD {
 			}
 			else {
 				/* Request fulfilled */
-				return newFixedLengthResponse(NanoHTTPD.Response.Status.OK,
+				Response r = newFixedLengthResponse(NanoHTTPD.Response.Status.OK,
 						"application/json", resp.toString().replace("\\/", "/"));
+				r.addHeader("Access-Control-Allow-Origin", "*");
+				r.addHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+				r.addHeader("Access-Control-Allow-Credentials", "true");
+				r.addHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS,HEAD");
+				return r;
 			}
 		}
 		return newFixedLengthResponse(html);
@@ -104,6 +110,27 @@ public class Server extends NanoHTTPD {
 					"application/json", io.github.rowak.recipesappserver
 					.net.Response.VERSION.toString());
 		}
+		else if (req.getType() == RequestType.FILE)
+		{
+			final String ROOT = "src/main/";
+			String url = req.getData().has("fileName") ?
+					ROOT + req.getData().getString("fileName") : null;
+			if (url != null && !url.contains("/../"));
+			{
+				File file = new File(url);
+				if (file.exists())
+				{
+					String extensionLong = url.substring(url.length()-5);
+					String extension = extensionLong.split("\\.")[1];
+					String mimeType = "text/" + extension;
+					return newFixedLengthResponse(NanoHTTPD.Response.Status.OK,
+							mimeType, readFileToString(file));
+				}
+			}
+			return newFixedLengthResponse(NanoHTTPD.Response.Status.NOT_FOUND,
+					"application/json", io.github.rowak.recipesappserver
+					.net.Response.RESOURCE_NOT_FOUND.toString());
+		}
 //		/*
 //		 * Safety check: if client reports a version that does not
 //		 * match server, then the request is rejected, since the
@@ -115,6 +142,27 @@ public class Server extends NanoHTTPD {
 //					"application/json", io.github.rowak.recipesappserver
 //						.net.Response.OUTDATED_CLIENT.toString());
 //		}
+		return null;
+	}
+	
+	private String readFileToString(File file)
+	{
+		try
+		{
+			StringBuilder sb = new StringBuilder();
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			String line;
+			while ((line = reader.readLine()) != null)
+			{
+				sb.append(line);
+			}
+			reader.close();
+			return sb.toString();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 		return null;
 	}
 	
