@@ -18,6 +18,7 @@ public class RequestHandler {
 	private final String WEBSTYLE_CSS_URL = CSS_SRC_URL + "webstyle.css";
 	private final String LOAD_CATEGORIES_JS_URL = JS_SRC_URL + "load_categories.js";
 	private final String LOAD_RECIPE_HEADERS_JS_URL = JS_SRC_URL + "load_recipe_headers.js";
+	private final String LOAD_RECIPE_JS_URL = JS_SRC_URL + "load_recipe.js";
 	
 	private RecipesDB db = new RecipesDB();
 	
@@ -41,6 +42,8 @@ public class RequestHandler {
 				return getFileResponse(LOAD_CATEGORIES_JS_URL);
 			case JS_LOAD_RECIPE_HEADERS:
 				return getFileResponse(LOAD_RECIPE_HEADERS_JS_URL);
+			case JS_LOAD_RECIPE:
+				return getFileResponse(LOAD_RECIPE_JS_URL);
 			case CSS_WEBSTYLE:
 				return getFileResponse(WEBSTYLE_CSS_URL);
 			default:

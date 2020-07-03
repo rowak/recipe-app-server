@@ -29,7 +29,7 @@ function decToHex(n) {
     return hex;
 }
 
-/* Adapted from https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB_alternative */
+/* From https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB_alternative */
 function hsbToRgb(h, s, b) {
     function f(n) {
         let k = (n + h / 60) % 6;
@@ -56,14 +56,57 @@ function getCategoryFromHash() {
     return c;
 }
 
+function showLoadingText() {
+    var header = document.getElementById("header");
+    if (header != null) {
+        header.remove();
+    }
+    var categoryList = document.getElementById("categoryList");
+    if (categoryList != null) {
+        categoryList.remove();
+    }
+    var recipeHeaderList = document.getElementById("recipeHeaderList");
+    if (recipeHeaderList != null) {
+        recipeHeaderList.remove();
+    }
+    var loadingText = document.createElement("p");
+    loadingText.id = "loadingText";
+    loadingText.innerHTML = "Loading...";
+    document.body.appendChild(loadingText);
+}
+
+function showHeader() {
+    var header = document.getElementById("header");
+    if (header != null) {
+        header.remove();
+    }
+    var loadingText = document.getElementById("loadingText");
+    if (loadingText != null) {
+        loadingText.remove();
+    }
+    var categoryList = document.getElementById("categoryList");
+    if (categoryList != null) {
+        categoryList.remove();
+    }
+    var recipeHeaderList = document.getElementById("recipeHeaderList");
+    if (recipeHeaderList != null) {
+        recipeHeaderList.remove();
+    }
+    var categoriesHeader = document.createElement("h1");
+    categoriesHeader.innerHTML = "Categories";
+    categoriesHeader.id = "header";
+    document.body.appendChild(categoriesHeader);
+}
+
 function updateCategories(category, categories) {
     parentCategory = category;
+    showHeader();
     var oldList = document.getElementById("categoryList");
     if (oldList != null) {
         oldList.remove();
     }
     var headerText = parentCategory != null ? parentCategory : "Categories";
-    document.getElementById("header").innerHTML = headerText;
+    document.getElementById("header").innerHTML = headerText.replace("%20", " ");
     var list = document.createElement("ul");
     list.id = "categoryList";
     let hue = 0;
@@ -75,11 +118,13 @@ function updateCategories(category, categories) {
             item.className = "categoryItem";
             var link = document.createElement("a");
             link.innerHTML = category;
+            link.href = "#" + category;
             if (getNumChildren(category, categories) == 0) {
-                link.href = "categoryView?category=" + category;
+                /*link.href = "categoryView?category=" + category;*/
+                link.addEventListener("click", function() {loadRecipeHeaders(category)});
             }
             else {
-                link.href = "#" + category;
+                /*link.href = "#" + category;*/
                 link.addEventListener("click", function() {updateCategories(category, categories)});
             }
             link.style = "color: " + getColor(hue);
@@ -88,24 +133,30 @@ function updateCategories(category, categories) {
             list.appendChild(item);
             hue += 20;
         }
+        else if (category == parentCategory && getNumChildren(category, categories) == 0) {
+            loadRecipeHeaders(category)
+        }
     }
     document.body.appendChild(list);
 }
 
 function loadCategories(categories) {
+    /*
     var categoriesHeader = document.createElement("h1");
     categoriesHeader.innerHTML = "Categories";
     categoriesHeader.id = "header";
     document.body.appendChild(categoriesHeader);
+    */
+
+
+    /*showHeader();*/
 
     updateCategories(parentCategory, categories);
 
-    document.getElementById("loadingText").remove();
+    /*document.getElementById("loadingText").remove();*/
 }
 
-/*var parentCategory = location.search.split("c=")[1];*/
 var parentCategory = getCategoryFromHash();
-console.log(parentCategory);
 var xmlHttp = new XMLHttpRequest();
 xmlHttp.onload = function() {
     var response = JSON.parse(xmlHttp.responseText);

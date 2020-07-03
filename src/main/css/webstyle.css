@@ -34,6 +34,37 @@ a.categoryLink {
     background: #5eb8f7;
 }
 
+div.recipeHeader {
+    background: white;
+    margin-left: 100px;
+    margin-right: 150px;
+    margin-bottom: 20px;
+    padding: 25px;
+    border: 7px solid black;
+    overflow: hidden;
+}
+
+img.recipeHeaderImage {
+    float: left;
+    margin-right: 20px;
+    border: 7px solid black;
+}
+
+.recipeHeaderTitle {
+    margin-top: 10px;
+    margin-bottom: 0px;
+    color: black;
+    font-size: 60px;
+    font-weight: bold;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.recipeHeaderDesc {
+    color: black;
+    font-size: 35px;
+    font-family: 'Open Sans', sans-serif;
+}
+
 #header {
     color: black;
     background: white;

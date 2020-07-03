@@ -10,5 +10,6 @@ public enum RequestType {
 	/* Web client requests */
 	JS_LOAD_CATEGORIES,      // required: *none*		  returns: load_categories.js
 	JS_LOAD_RECIPE_HEADERS,  // required: *none*		  returns: load_recipe_headers.js
+	JS_LOAD_RECIPE,			 // required: *none*		  returns: load_recipe.js
 	CSS_WEBSTYLE			 // required: *none*		  returns: webstyle.css
 }

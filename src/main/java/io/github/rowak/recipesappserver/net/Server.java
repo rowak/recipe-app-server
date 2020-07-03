@@ -47,7 +47,6 @@ public class Server extends NanoHTTPD {
 			} else if (type == ResponseType.FILE) {
 				File file = new File(resp.getData().getString("fileUrl"));
 				resp.getData().remove("fileUrl");
-				System.out.println(file.getAbsolutePath() + "   " + getMimeType(file));
 				return newFixedLengthResponse(NanoHTTPD.Response.Status.OK,
 						getMimeType(file), readFileToString(file));
 			} else {
