@@ -56,6 +56,15 @@ function getCategoryFromHash() {
     return c;
 }
 
+function categoryExists(category, categories) {
+    for (k = 0; k < categories.length; k++) {
+        if (category == categories[k].name) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function showLoadingText() {
     var header = document.getElementById("header");
     if (header != null) {
@@ -68,6 +77,10 @@ function showLoadingText() {
     var recipeHeaderList = document.getElementById("recipeHeaderList");
     if (recipeHeaderList != null) {
         recipeHeaderList.remove();
+    }
+    var recipe = document.getElementById("recipe");
+    if (recipe != null) {
+        recipe.remove();
     }
     var loadingText = document.createElement("p");
     loadingText.id = "loadingText";
@@ -92,6 +105,10 @@ function showHeader() {
     if (recipeHeaderList != null) {
         recipeHeaderList.remove();
     }
+    var recipe = document.getElementById("recipe");
+    if (recipe != null) {
+        recipe.remove();
+    }
     var categoriesHeader = document.createElement("h1");
     categoriesHeader.innerHTML = "Categories";
     categoriesHeader.id = "header";
@@ -106,10 +123,13 @@ function updateCategories(category, categories) {
         oldList.remove();
     }
     var headerText = parentCategory != null ? parentCategory : "Categories";
-    document.getElementById("header").innerHTML = headerText.replace("%20", " ");
+    document.getElementById("header").innerHTML = decodeURI(headerText);
     var list = document.createElement("ul");
     list.id = "categoryList";
     let hue = 0;
+    if (parentCategory != null && !categoryExists(parentCategory, categories)) {
+        loadRecipe(parentCategory);
+    }
     for (i = 0; i < categories.length; i++) {
         let category = categories[i].name;
         let parent = categories[i].parent;
