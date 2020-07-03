@@ -244,7 +244,7 @@ public class RecipesDB {
 				 "JOIN creators ON recipes.creator_id = creators.creator_id) " +
 				 "JOIN recipe_categories ON recipes.category_id = recipe_categories.category_id) " +
 				 "LEFT OUTER JOIN recipe_images ON recipes.recipe_id = recipe_images.recipe_id) " +
-				 "WHERE recipes.recipe_name = '" + recipeName + "';");
+				 "WHERE recipes.recipe_name = '" + recipeName.replace("'", "''") + "';");
 	}
 	
 	private ResultSet getRecipeIngredientsTable(int recipeId) throws SQLException {
