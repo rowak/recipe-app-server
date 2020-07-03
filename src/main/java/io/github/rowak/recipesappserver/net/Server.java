@@ -16,6 +16,8 @@ public class Server extends NanoHTTPD {
 	public static final Version VERSION = new Version("0.0.1");
 	public static final Version[] SUPPORTED_VERSIONS = {new Version("0.0.1")};
 	private final String HTML_PATH = "index.html";
+	private final String MIME_JAVASCRIPT = "text/javascript";
+	private final String MIME_CSS = "text/css";
 	
 	private String html;
 	private RequestHandler requestHandler = new RequestHandler();
@@ -42,8 +44,13 @@ public class Server extends NanoHTTPD {
 				/* Request not fulfilled */
 				return newFixedLengthResponse(NanoHTTPD.Response.Status.BAD_REQUEST,
 						"application/json", resp.toString().replace("\\/", "/"));
-			}
-			else {
+			} else if (type == ResponseType.FILE) {
+				File file = new File(resp.getData().getString("fileUrl"));
+				resp.getData().remove("fileUrl");
+				System.out.println(file.getAbsolutePath() + "   " + getMimeType(file));
+				return newFixedLengthResponse(NanoHTTPD.Response.Status.OK,
+						getMimeType(file), readFileToString(file));
+			} else {
 				/* Request fulfilled */
 				Response r = newFixedLengthResponse(NanoHTTPD.Response.Status.OK,
 						"application/json", resp.toString().replace("\\/", "/"));
@@ -103,38 +110,41 @@ public class Server extends NanoHTTPD {
 					"application/json", io.github.rowak.recipesappserver
 					.net.Response.INVALID_REQUEST.toString());
 		}
-		if (req.getType() == RequestType.VERSION)
-		{
+		if (req.getType() == RequestType.VERSION) {
 			/* Avoid version check below, no version parameter required */
 			return newFixedLengthResponse(NanoHTTPD.Response.Status.OK,
 					"application/json", io.github.rowak.recipesappserver
 					.net.Response.VERSION.toString());
 		}
-		else if (req.getType() == RequestType.FILE)
-		{
-			final String ROOT = "src/main/";
-			String url = req.getData().has("fileName") ?
-					ROOT + req.getData().getString("fileName") : null;
-			if (url != null && !url.contains("/../"));
-			{
-				File file = new File(url);
-				if (file.exists())
-				{
-					String extensionLong = url.substring(url.length()-5);
-					String extension = extensionLong.split("\\.")[1];
-					String mimeType = "text/" + extension;
-					if (mimeType.equals("js"))
-					{
-						mimeType = "javascript";
-					}
-					return newFixedLengthResponse(NanoHTTPD.Response.Status.OK,
-							mimeType, readFileToString(file));
-				}
-			}
-			return newFixedLengthResponse(NanoHTTPD.Response.Status.NOT_FOUND,
-					"application/json", io.github.rowak.recipesappserver
-					.net.Response.RESOURCE_NOT_FOUND.toString());
-		}
+		
+		
+//		else if (req.getType() == RequestType.FILE)
+//		{
+//			final String ROOT = "src/main/";
+//			String url = req.getData().has("fileName") ?
+//					ROOT + req.getData().getString("fileName") : null;
+//			if (url != null && !url.contains("/../"));
+//			{
+//				File file = new File(url);
+//				if (file.exists())
+//				{
+//					String extensionLong = url.substring(url.length()-5);
+//					String extension = extensionLong.split("\\.")[1];
+//					String mimeType = "text/" + extension;
+//					if (mimeType.equals("js"))
+//					{
+//						mimeType = "javascript";
+//					}
+//					return newFixedLengthResponse(NanoHTTPD.Response.Status.OK,
+//							mimeType, readFileToString(file));
+//				}
+//			}
+//			return newFixedLengthResponse(NanoHTTPD.Response.Status.NOT_FOUND,
+//					"application/json", io.github.rowak.recipesappserver
+//					.net.Response.RESOURCE_NOT_FOUND.toString());
+//		}
+		
+		
 //		/*
 //		 * Safety check: if client reports a version that does not
 //		 * match server, then the request is rejected, since the
@@ -146,27 +156,6 @@ public class Server extends NanoHTTPD {
 //					"application/json", io.github.rowak.recipesappserver
 //						.net.Response.OUTDATED_CLIENT.toString());
 //		}
-		return null;
-	}
-	
-	private String readFileToString(File file)
-	{
-		try
-		{
-			StringBuilder sb = new StringBuilder();
-			BufferedReader reader = new BufferedReader(new FileReader(file));
-			String line;
-			while ((line = reader.readLine()) != null)
-			{
-				sb.append(line);
-			}
-			reader.close();
-			return sb.toString();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
 		return null;
 	}
 	
@@ -191,6 +180,36 @@ public class Server extends NanoHTTPD {
 			}
 		}
 		return clientVersion.greater(VERSION) || clientVersion.equals(VERSION);
+	}
+	
+	private String readFileToString(File file) {
+		try {
+			StringBuilder sb = new StringBuilder();
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				sb.append(line);
+			}
+			reader.close();
+			return sb.toString();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	private String getMimeType(File file) {
+		String url = file.getAbsolutePath();
+		String extensionLong = url.substring(url.length()-5);
+		String extension = extensionLong.split("\\.")[1];
+		switch (extension) {
+			case "js":
+				return MIME_JAVASCRIPT;
+			case "css":
+				return MIME_CSS;
+			default:
+				return null;
+		}
 	}
 	
 	/*

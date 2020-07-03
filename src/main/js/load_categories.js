@@ -8,8 +8,6 @@ function getColor(hue) {
 
 function hsbToHex(h, s, b) {
     var rgb = hsbToRgb(h, s, b);
-    console.log(rgb[0] + "  " + rgb[1] + "  " + rgb[2] + "     " + "#" + decToHex(rgb[0]) + "  " + decToHex(rgb[1]) + "  " + decToHex(rgb[2]));
-    console.log(decToHex(255));
     return "#" + decToHex(rgb[0]) + decToHex(rgb[1]) + decToHex(rgb[2]);
 }
 
@@ -40,33 +38,83 @@ function hsbToRgb(h, s, b) {
     return [f(5)*255, f(3)*255, f(1)*255];
 }
 
-var parentCategory = null;
+function getNumChildren(parent, categories) {
+    let children = 0;
+    for (j = 0; j < categories.length; j++) {
+        if (categories[j].parent == parent) {
+            children++;
+        }
+    }
+    return children;
+}
+
+function getCategoryFromHash() {
+    let c = window.location.hash.substring(1);
+    if (!c) {
+        c = null;
+    }
+    return c;
+}
+
+function updateCategories(category, categories) {
+    parentCategory = category;
+    var oldList = document.getElementById("categoryList");
+    if (oldList != null) {
+        oldList.remove();
+    }
+    var headerText = parentCategory != null ? parentCategory : "Categories";
+    document.getElementById("header").innerHTML = headerText;
+    var list = document.createElement("ul");
+    list.id = "categoryList";
+    let hue = 0;
+    for (i = 0; i < categories.length; i++) {
+        let category = categories[i].name;
+        let parent = categories[i].parent;
+        if (parent == parentCategory) {
+            var item = document.createElement("li");
+            item.className = "categoryItem";
+            var link = document.createElement("a");
+            link.innerHTML = category;
+            if (getNumChildren(category, categories) == 0) {
+                link.href = "categoryView?category=" + category;
+            }
+            else {
+                link.href = "#" + category;
+                link.addEventListener("click", function() {updateCategories(category, categories)});
+            }
+            link.style = "color: " + getColor(hue);
+            link.className = "categoryLink";
+            item.appendChild(link);
+            list.appendChild(item);
+            hue += 20;
+        }
+    }
+    document.body.appendChild(list);
+}
+
+function loadCategories(categories) {
+    var categoriesHeader = document.createElement("h1");
+    categoriesHeader.innerHTML = "Categories";
+    categoriesHeader.id = "header";
+    document.body.appendChild(categoriesHeader);
+
+    updateCategories(parentCategory, categories);
+
+    document.getElementById("loadingText").remove();
+}
+
+/*var parentCategory = location.search.split("c=")[1];*/
+var parentCategory = getCategoryFromHash();
+console.log(parentCategory);
 var xmlHttp = new XMLHttpRequest();
 xmlHttp.onload = function() {
     var response = JSON.parse(xmlHttp.responseText);
     var categories = response.data;
-    var list = document.createElement("ul");
-    list.className = "categoryList";
-    let hue = 0;
-    for (i = 0; i < categories.length; i++) {
-        let category = categories[i].name;
-        var item = document.createElement("li");
-        item.className = "categoryItem";
-        var link = document.createElement("a");
-        link.innerHTML = category;
-        link.href = "file?fileName=categoryView.html&category=" + category;
-        link.style = "color: " + getColor(hue);
-        link.className = "categoryLink";
-        item.appendChild(link);
-        list.appendChild(item);
-        hue += 15;
+    loadCategories(categories);
+
+    window.onhashchange = function() {
+        updateCategories(getCategoryFromHash(), categories);
     }
-    var categoriesHeader = document.createElement("h1");
-    categoriesHeader.innerHTML = "Categories";
-    categoriesHeader.className = "header";
-    document.body.appendChild(categoriesHeader);
-    document.body.appendChild(list);
-    document.getElementById("loadingText").remove();
 };
 xmlHttp.open("GET", "categories");
 xmlHttp.setRequestHeader("Content-Type", "application/json");
