@@ -309,27 +309,7 @@ function updateRecipe(recipe) {
     divRecipeHeader.appendChild(pRecipeName);
     divRecipeHeader.appendChild(pRecipeDesc);
     divRecipeHeader.appendChild(divTimes);
-    /*var divIngredients = document.createElement("div");*/
     var divIngredients = getIngredientsElement(recipe, recipe.header.servings);
-    /*divIngredients.className = "divGroup";*/
-    /*
-    var ingredientsHeader = document.createElement("h2");
-    ingredientsHeader.className = "recipeHeaderText";
-    ingredientsHeader.innerHTML = "Ingredients";
-    */
-    /*
-    var ingredientsList = document.createElement("ul");
-    ingredientsList.id = "ingredientList";
-    IngredientSort.sortByName(recipe.ingredients);
-    IngredientSort.sortByCategory(recipe.ingredients);
-    for (i = 0; i < recipe.ingredients.length; i++) {
-        var ingredientItem = document.createElement("li");
-        ingredientItem.innerHTML = getIngredientString(recipe.ingredients[i], recipe.header.servings, recipe.header.servings);
-        ingredientsList.appendChild(ingredientItem);
-    }
-    */
-    /*divIngredients.appendChild(ingredientsHeader);*/
-    /*divIngredients.appendChild(ingredientsList);*/
     var directionsHeader = document.createElement("h2");
     directionsHeader.className = "recipeHeaderText";
     directionsHeader.innerHTML = "Directions";
@@ -341,7 +321,6 @@ function updateRecipe(recipe) {
     recipeElmt.appendChild(directionsHeader);
     recipeElmt.appendChild(pDirections);
     showHeader();
-    /*var headerText = "Recipe";*/
     document.getElementById("header").innerHTML = decodeURI(recipe.header.name);
     document.body.appendChild(recipeElmt);
 }
