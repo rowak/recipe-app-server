@@ -140,11 +140,8 @@ function updateCategories(category, categories) {
             link.innerHTML = category;
             link.href = "#" + category;
             if (getNumChildren(category, categories) == 0) {
-                /*link.href = "categoryView?category=" + category;*/
                 link.addEventListener("click", function() {loadRecipeHeaders(category)});
-            }
-            else {
-                /*link.href = "#" + category;*/
+            } else {
                 link.addEventListener("click", function() {updateCategories(category, categories)});
             }
             link.style = "color: " + getColor(hue);
@@ -154,7 +151,7 @@ function updateCategories(category, categories) {
             hue += 20;
         }
         else if (category == parentCategory && getNumChildren(category, categories) == 0) {
-            loadRecipeHeaders(category)
+            loadRecipeHeaders(category);
         }
     }
     document.body.appendChild(list);
@@ -176,7 +173,10 @@ function loadCategories(categories) {
     /*document.getElementById("loadingText").remove();*/
 }
 
-var parentCategory = getCategoryFromHash();
+var parentCategory = decodeURI(getCategoryFromHash());
+if (parentCategory == "null") {
+    parentCategory = null;
+}
 var xmlHttp = new XMLHttpRequest();
 xmlHttp.onload = function() {
     var response = JSON.parse(xmlHttp.responseText);
@@ -184,7 +184,11 @@ xmlHttp.onload = function() {
     loadCategories(categories);
 
     window.onhashchange = function() {
-        updateCategories(getCategoryFromHash(), categories);
+        var category = decodeURI(getCategoryFromHash());
+        if (category == "null") {
+            category = null;
+        }
+        updateCategories(category, categories);
     }
 };
 xmlHttp.open("GET", "categories");

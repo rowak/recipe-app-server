@@ -326,6 +326,7 @@ function updateRecipe(recipe) {
 }
 
 function loadRecipe(recipeName) {
+    recipeName = decodeURI(recipeName);
     showLoadingText();
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onload = function() {
